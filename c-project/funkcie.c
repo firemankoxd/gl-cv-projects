@@ -6,7 +6,7 @@
 
 int saveData[2][2100];
 
-//Nacitanie stlacenej klavesy
+// Getting keycode
 int getCode (void){
     int ch = getch();
     if(ch==0 || ch==224)
@@ -14,7 +14,7 @@ int getCode (void){
     return ch;
 }
 
-//Identifikacia znaku leziaceho na kurzore
+// Getting char based on a cursor position
 char getCursorChar(){
     char c = '\0';
     CONSOLE_SCREEN_BUFFER_INFO con;
@@ -29,7 +29,7 @@ char getCursorChar(){
     return c;
 }
 
-//Pohyb kurzora po konzole
+// Moving cursor in the console
 void gotoxy(int x, int y){
     COORD coord;
     coord.X = x;
@@ -37,11 +37,11 @@ void gotoxy(int x, int y){
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-//Funkcia na zmazanie všetkých znakov na kresliacej ploche
+// Clearing all characters on drawing area
 void clearArea(){
-    gotoxy(2,2);            //skok na zaciatok kresliacej plochy
+    gotoxy(2,2);            // jump to the start of drawing area
     for(int i=2;i<30;i++){
-        gotoxy(2,i);        //skok na zaciatok riadku i
+        gotoxy(2,i);        // jump to the start of i-th row
         for(int j=2;j<70;j++){
             printf(" ");
         }
@@ -49,6 +49,7 @@ void clearArea(){
     }
 }
 
+// Clearing the savedata array
 void clearSaveData(){
     for(int j=0;j<2;j++){
         for(int i=0;i<2100;i++){
@@ -57,7 +58,7 @@ void clearSaveData(){
     }
 }
 
-//Oznacovanie zvolenej moznosti v menu
+// Highligting options in menu
 void oznacMoznost(int g){
     switch(g){
         case 1:
@@ -111,7 +112,7 @@ void oznacMoznost(int g){
     }
 }
 
-//Vypisanie klaves
+// Listing all controls
 void klavesy(){
     gotoxy(10,10);
     printf("Pohyb:\t  SIPKY");
@@ -130,7 +131,7 @@ void klavesy(){
     Sleep(5000);
 }
 
-//Funkcia na nacitanie dat zo suboru do 2D pola
+// Loading data from csv file to 2D array
 void getFileData(char fileName[32]){
     clearSaveData();
     int p,n;
@@ -138,21 +139,21 @@ void getFileData(char fileName[32]){
     FILE *f = fopen(fileName, "r");
     if(f){
         do{
-            p=fgetc(f);                     //Nacítanie jedneho znaku
-            if(p==','){                     //Preskocit ak znak nieje cislo
+            p=fgetc(f);                     // Loading one character
+            if(p==','){                     // Skip if char is separator (comma)
                 countN = 0;
-            } else if(p=='\n'){             //Preskocit ak znak nieje cislo
+            } else if(p=='\n'){             // Skip is char is end of line
                 countN = 0;
-            } else if(p!=',' && p!='\n'){   //Pokracovat ak je znak cislo
+            } else if(p!=',' && p!='\n'){   // Continue if char is a number
                 if(countN==0){
-                    n = p - '0';            //Premena ASCII hodnoty cisla na jeho skutocnu hodnotu
+                    n = p - '0';            // ASCII value conversion to actual integer value
                     countN++;
                 } else {
-                    //V pripade ze je cislo dvojciferne
+                    // If number has two digits (greater than 9)
                     int zvys = p - '0';
                     n = n*10 + zvys;
                     saveData[b][v]=n;
-                    //Nastavovanie adresy v poli
+                    // Setting array indexes
                     if(b==0){
                         b++;
                     } else {
@@ -161,7 +162,7 @@ void getFileData(char fileName[32]){
                     }
                 }
             }
-        //DO-WHILE az po koniec suboru
+        //DO-WHILE till the end of the file
         } while (p!= EOF);
     gotoxy(1,33);
     printf("Nacitavanie dokoncene...");

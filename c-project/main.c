@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include "funkcie.h"
 
-//ASCII KODY SYMBOLOV POUZITYCH NA TVORBU PROSTREDIA
+// Ascii values of symbols used to draw the frame of drawing area
 #define VT 186
 #define DL 187
 #define HL 188
@@ -24,7 +24,7 @@
 #define DP 201
 #define HZ 205
 
-//sucast kodu pre overenie stlacenej klavesy
+// Keycodes
 enum{
     KEY_ESC     = 27,
     ARROW_UP    = 256 + 72,
@@ -33,19 +33,19 @@ enum{
     ARROW_RIGHT = 256 + 77
 };
 
-/*--------NASTAVENIA--------*/
-char dataFile[32] = "xy.csv";   //Subor z ktoreho sa nacitavaju znaky do pola
-char znak = '#';                //Znak ktory bude vypisovany v skicari
+// Variables
+char dataFile[32] = "xy.csv";   // File to save/load the drawing
+char znak = '#';                // Character used to draw in drawing area
 
 void setup(),menu(),vytvor(),nacitaj();
-int ch;                         //Premenna do funkcie get_code();
-int q;                          //Pocitacia premenna pre ukladanie do pola
-int cursorPosX,cursorPosY;      //X,Y suradnice kurzora v konzole
-int moznostMenu=1;              //Premenna do funkcie oznacMoznost();
-char c;                         //Premenna ktoru vracia funkcia getCursorChar();
-int saveData[2][2100];          //2D pole ktore uklada X,Y suradnice znakov
-int rectX,rectY;                //X,Y suradnice pre tvorbu obdlznika
-bool rectActive = false;        //Logicka premenna pre tvorbu obdlznika
+int ch;                         // Variable used in get_code() function
+int q;                          // Counter for indexing an array
+int cursorPosX,cursorPosY;      // X,Y coords of cursor
+int moznostMenu=1;              // Current option in menu => oznacMoznost()
+char c;                         // Return value from getCursorChar()
+int saveData[2][2100];          // 2D array used to store X,Y coords of cursor
+int rectX,rectY;                // X,Y coords used to draw a rectangle
+bool rectActive = false;        // Used to draw a rectangle
 
 int main(){
     setup();
@@ -64,7 +64,7 @@ z1: menu();
             goto z1;
         case 4:
             gotoxy(0,32);
-            //Vypnutie aplikacie
+            // Killing the app
             system("taskkill/IM cb_console_runner.exe");
         default:
             break;
@@ -80,40 +80,40 @@ void vytvor(){
     gotoxy(cursorPosX,cursorPosY);
     while((ch = getCode()) != KEY_ESC){
         switch(ch){
-            //POHYB HORE
+            // MOVE UP
             case ARROW_UP:
-                if(cursorPosY>2){//hranica zhora
+                if(cursorPosY>2){ // upper border
                     cursorPosY--;
                     gotoxy(cursorPosX,cursorPosY);
                 }
                 break;
-            //POHYB DOLE
+            // MOVE DOWN
             case ARROW_DOWN:
-                if(cursorPosY<29){//hranica zdola
+                if(cursorPosY<29){ // lower border
                     cursorPosY++;
                     gotoxy(cursorPosX,cursorPosY);
                 }
                 break;
-            //POHYB DOLAVA
+            // MOVE LEFT
             case ARROW_LEFT:
-                if(cursorPosX>2){//hranica zlava
+                if(cursorPosX>2){ // left border
                     cursorPosX--;
                     gotoxy(cursorPosX,cursorPosY);
                 }
                 break;
-            //POHYB DOPRAVA
+            // MOVE RIGHT
             case ARROW_RIGHT:
-                if(cursorPosX<69){//hranica sprava
+                if(cursorPosX<69){ // right border
                     cursorPosX++;
                     gotoxy(cursorPosX,cursorPosY);
                 }
                 break;
-            //VPISANIE ZNAKU NA KURZORE
-            case ' '://AK JE STLACENY MEDZERNIK
+            // DRAWING A CHARACTER INTO DRAWING AREA
+            case ' ': // IF SPACE IS PRESSED
                 printf("%c",znak);
                 gotoxy(cursorPosX,cursorPosY);
                 break;
-            //VYTVORENIE OBDLZNIKA
+            // CREATING RECTANGLE
             case 'r':
                 if(!rectActive){
                     rectX=cursorPosX;
@@ -157,20 +157,20 @@ void vytvor(){
                 }
                 rectActive=!rectActive;
                 break;
-            //ZMAZANIE ZNAKU NA KURZORE
+            // DELETING CHARACTER ON CURSOR POSITION
             case 'c':
                 printf(" ");
                 gotoxy(cursorPosX,cursorPosY);
                 break;
-            //ZMAZANIE CELEJ PLOCHY
+            // ERASING WHOLE DRAWING AREA
             case 'm':
                 clearArea();
                 gotoxy(cursorPosX,cursorPosY);
                 break;
-            //VYPIS KLAVES
+            // SHOWING CONTROLS
             case 'k':
                 q = 0;
-                //Ulozenie X,Y suradníc do 2D pola
+                // Saving the drawing area before erasing it
                 for(int i=2;i<70;i++){
                     for(int j=2;j<30;j++){
                         gotoxy(i,j);
@@ -182,8 +182,10 @@ void vytvor(){
                     }
                 }
                 clearArea();
+                // Showing actual controls
                 klavesy();
                 clearArea();
+                // Loading saved image back to drawing area
                 for(int j=0;j<2100;j++){
                     for(int k=2;k<70;k++){
                         for(int l=2;l<30;l++){
@@ -197,9 +199,9 @@ void vytvor(){
                 gotoxy(cursorPosX,cursorPosY);
                 clearSaveData();
                 break;
-            //ULOZENIE OBRAZKA
+            // SAVING DRAWED PICTURE TO FILE
             case 's':
-                //Ulozenie X,Y suradníc do 2D pola
+                // Storing X,Y coords to 2D array
                 q = 0;
                 for(int i=2;i<70;i++){
                     for(int j=2;j<30;j++){
@@ -214,7 +216,7 @@ void vytvor(){
                         }
                     }
                 }
-                //Ulozenie X,Y suradníc z pola do súboru
+                // Copying X,Y coords from array to file
                 FILE *f = fopen(dataFile, "wb");
                 for(int i=0;i<2100;i++){
                     for(int j=0;j<2;j++){
@@ -231,20 +233,21 @@ void vytvor(){
                 break;
             }
         gotoxy(0,31);
+        // Showing current cursor position
         printf(" X= %d   \n Y= %d   ",cursorPosX-2,cursorPosY-2);
         gotoxy(cursorPosX,cursorPosY);
     }
     gotoxy(0,32);
-    //Vypnutie aplikacie
+    // Killing the app
     system("taskkill/IM cb_console_runner.exe");
 }
 
 void nacitaj(){
     gotoxy(1,33);
     printf("Prebieha nacitavanie...");
-    //Nacitanie X,Y suradnic do 2D pola
+    // Loading X,Y coords from file to 2D array
     getFileData(dataFile);
-    //Nacitanie znakov z 2D pola
+    // Drawing characters from array to drawing area
     for(int j=0;j<2100;j++){
         for(int k=2;k<70;k++){
             for(int l=2;l<30;l++){
@@ -274,6 +277,7 @@ void menu(){
     printf(">");
     gotoxy(40,11);
     printf("<");
+    // Menu controls
     while((ch = getCode()) != KEY_ESC){
 	    switch(ch){
             case ARROW_UP:
@@ -293,11 +297,11 @@ void menu(){
 }
 
 void setup(){
-    //Zmena nazvu aplikacie na "Skicar"
-    SetConsoleTitle("Skic\xA0r"); //\xA0 = a s dlznom
-    //Vynulovanie hodnot v 2D poli
+    // Changing the name of app
+    SetConsoleTitle("Skic\xA0r"); // \xA0 = á
+    // Clearing the 2D array
     clearSaveData();
-    //Vykreslenie plochy, resp. hranic skicaru
+    // Frame of the drawing area
     gotoxy(1,1);
     printf("%c",DP);
     for(int i=0;i<68;i++) printf("%c",HZ);
