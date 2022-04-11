@@ -17,7 +17,7 @@
 
 #define _USE_WRITE 1
 
-/* ZOZNAM PINOV:
+/* Pins that I use:
 	PORTB2 - CS (Chip Select) / SS (Slave Select)
 	PORTB3 - MOSI (Master Out Slave In)
 	PORTB4 - MISO (Master In Slave Out)
